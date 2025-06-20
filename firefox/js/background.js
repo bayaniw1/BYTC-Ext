@@ -74,6 +74,26 @@ let wakeupRun = false;
 
 /******************************************************************************/
 
+async function registerSponsorBlock() {
+    if ( browser.scripting === undefined ) { return; }
+    const isGecko = runtime.getURL('').startsWith('moz-extension://');
+    const directive = {
+        id: 'sponsorblock',
+        js: [ '/js/sponsorblock.js' ],
+        matches: [ '*://*.youtube.com/*' ],
+        runAt: 'document_idle',
+    };
+    if ( isGecko === false ) {
+        directive.world = 'MAIN';
+        directive.matchOriginAsFallback = true;
+    }
+    const registered = await browser.scripting.getRegisteredContentScripts().catch(( ) => []);
+    if ( Array.isArray(registered) && registered.some(v => v.id === 'sponsorblock') ) { return; }
+    await browser.scripting.registerContentScripts([ directive ]).catch(reason => { console.info(reason); });
+}
+
+/******************************************************************************/
+
 function getCurrentVersion() {
     return runtime.getManifest().version;
 }
@@ -140,6 +160,7 @@ async function onPermissionsRemoved() {
         updateDynamicRules();
     }
     registerInjectables();
+    registerSponsorBlock();
     return true;
 }
 
@@ -183,6 +204,7 @@ function onMessage(request, sender, callback) {
             return saveRulesetConfig();
         }).then(( ) => {
             registerInjectables();
+            registerSponsorBlock();
             callback();
             broadcastMessage({ enabledRulesets: rulesetConfig.enabledRulesets });
         });
@@ -271,6 +293,7 @@ function onMessage(request, sender, callback) {
             return setFilteringMode(request.hostname, request.level);
         }).then(actualLevel => {
             registerInjectables();
+            registerSponsorBlock();
             callback(actualLevel);
         });
         return true;
@@ -287,6 +310,7 @@ function onMessage(request, sender, callback) {
             }
             if ( afterLevel !== beforeLevel ) {
                 registerInjectables();
+                registerSponsorBlock();
             }
             callback(afterLevel);
         });
@@ -296,6 +320,7 @@ function onMessage(request, sender, callback) {
     case 'setTrustedSites':
         setTrustedSites(request.hostnames).then(( ) => {
             registerInjectables();
+            registerSponsorBlock();
             return Promise.all([
                 getDefaultFilteringMode(),
                 getTrustedSites(),
@@ -355,6 +380,7 @@ async function start() {
     // launch time whether content css/scripts are properly registered.
     if ( wakeupRun === false || permissionsChanged ) {
         registerInjectables();
+        registerSponsorBlock();
 
         const enabledRulesets = await dnr.getEnabledRulesets();
         ubolLog(`Enabled rulesets: ${enabledRulesets}`);

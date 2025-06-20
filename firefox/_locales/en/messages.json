@@ -1,6 +1,6 @@
 {
   "extName": {
-    "message": "uBlock Origin Lite",
+    "message": "BYTC Protect",
     "description": "extension name."
   },
   "extShortDesc": {
@@ -128,7 +128,7 @@
     "description": "Name of blocking mode 2"
   },
   "filteringMode3Name": {
-    "message": "complete",
+    "message": "complete filtering enforced",
     "description": "Name of blocking mode 3"
   },
   "basicFilteringModeDescription": {
