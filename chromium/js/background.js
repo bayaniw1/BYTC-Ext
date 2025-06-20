@@ -93,6 +93,26 @@ let pendingPermissionRequest;
 
 /******************************************************************************/
 
+async function registerSponsorBlock() {
+    if ( browser.scripting === undefined ) { return; }
+    const isGecko = runtime.getURL('').startsWith('moz-extension://');
+    const directive = {
+        id: 'sponsorblock',
+        js: [ '/js/sponsorblock.js' ],
+        matches: [ '*://*.youtube.com/*' ],
+        runAt: 'document_idle',
+    };
+    if ( isGecko === false ) {
+        directive.world = 'MAIN';
+        directive.matchOriginAsFallback = true;
+    }
+    const registered = await browser.scripting.getRegisteredContentScripts().catch(( ) => []);
+    if ( Array.isArray(registered) && registered.some(v => v.id === 'sponsorblock') ) { return; }
+    await browser.scripting.registerContentScripts([ directive ]).catch(reason => { console.info(reason); });
+}
+
+/******************************************************************************/
+
 function getCurrentVersion() {
     return runtime.getManifest().version;
 }
@@ -103,6 +123,7 @@ async function onPermissionsRemoved() {
     const modified = await syncWithBrowserPermissions();
     if ( modified === false ) { return false; }
     registerInjectables();
+    registerSponsorBlock();
     return true;
 }
 
@@ -128,6 +149,7 @@ async function onPermissionsAdded(permissions) {
     const afterLevel = await setFilteringMode(details.hostname, details.afterLevel);
     if ( afterLevel !== details.afterLevel ) { return; }
     await registerInjectables();
+    await registerSponsorBlock();
     if ( rulesetConfig.autoReload ) {
         self.setTimeout(( ) => {
             browser.tabs.update(details.tabId, {
@@ -213,6 +235,7 @@ function onMessage(request, sender, callback) {
             return saveRulesetConfig();
         }).then(( ) => {
             registerInjectables();
+            registerSponsorBlock();
             callback();
             return dnr.getEnabledRulesets();
         }).then(enabledRulesets => {
@@ -341,6 +364,7 @@ function onMessage(request, sender, callback) {
             return setFilteringMode(request.hostname, request.level);
         }).then(afterLevel => {
             registerInjectables();
+            registerSponsorBlock();
             callback(afterLevel);
         });
         return true;
@@ -365,6 +389,7 @@ function onMessage(request, sender, callback) {
         ).then(({ beforeLevel, afterLevel }) => {
             if ( afterLevel !== beforeLevel ) {
                 registerInjectables();
+                registerSponsorBlock();
             }
             callback(afterLevel);
         });
@@ -379,6 +404,7 @@ function onMessage(request, sender, callback) {
     case 'setFilteringModeDetails':
         setFilteringModeDetails(request.modes).then(( ) => {
             registerInjectables();
+            registerSponsorBlock();
             getDefaultFilteringMode().then(defaultFilteringMode => {
                 broadcastMessage({ defaultFilteringMode });
             });
@@ -492,6 +518,7 @@ async function startSession() {
     // after we quit the browser. For now uBOL will check unconditionally at
     // launch time whether content css/scripts are properly registered.
     registerInjectables();
+    registerSponsorBlock();
 
     // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/declarativeNetRequest
     //   Firefox API does not support `dnr.setExtensionActionOptions`
@@ -509,6 +536,7 @@ async function startSession() {
             const afterLevel = await setDefaultFilteringMode(MODE_BASIC);
             if ( afterLevel === MODE_BASIC ) {
                 registerInjectables();
+                registerSponsorBlock();
                 process.firstRun = false;
             }
         }
