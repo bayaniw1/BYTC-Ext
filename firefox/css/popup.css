@@ -90,6 +90,7 @@ hr {
     align-self: center;
     margin: var(--popup-gap);
     width: calc(var(--popup-main-min-width) - 1em);
+    display: none;
     }
 
 .rulesetTools {
