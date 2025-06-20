@@ -41,10 +41,7 @@ import {
 
 /******************************************************************************/
 
-// 0:       no filtering
-// 1:    basic filtering
-// 2:  optimal filtering
-// 3: complete filtering
+// Filter mode constants (BYTC Protect enforces MODE_COMPLETE)
 
 export const     MODE_NONE = 0;
 export const    MODE_BASIC = 1;
@@ -233,30 +230,12 @@ async function readFilteringModeDetails() {
         readFilteringModeDetails.cache = unserializeModeDetails(sessionModes);
         return readFilteringModeDetails.cache;
     }
-    let [ userModes, adminNoFiltering ] = await Promise.all([
-        localRead('filteringModeDetails'),
-        localRead('adminNoFiltering'),
-    ]);
-    if ( userModes === undefined ) {
-        userModes = { basic: [ 'all-urls' ] };
-    }
-    userModes = unserializeModeDetails(userModes);
-    if ( Array.isArray(adminNoFiltering) ) {
-        for ( const hn of adminNoFiltering ) {
-            applyFilteringMode(userModes, hn, 0);
-        }
-    }
-    filteringModesToDNR(userModes);
-    sessionWrite('filteringModeDetails', serializeModeDetails(userModes));
-    readFilteringModeDetails.cache = userModes;
-    adminRead('noFiltering').then(results => {
-        if ( results ) {
-            localWrite('adminNoFiltering', results);
-        } else {
-            localRemove('adminNoFiltering');
-        }
-    });
-    return userModes;
+    const userModes = { complete: [ 'all-urls' ] };
+    const details = unserializeModeDetails(userModes);
+    filteringModesToDNR(details);
+    sessionWrite('filteringModeDetails', serializeModeDetails(details));
+    readFilteringModeDetails.cache = details;
+    return details;
 }
 
 /******************************************************************************/
@@ -386,6 +365,7 @@ export async function getFilteringMode(hostname) {
 }
 
 export async function setFilteringMode(hostname, afterLevel) {
+    afterLevel = MODE_COMPLETE;
     const filteringModes = await getFilteringModeDetails();
     const level = applyFilteringMode(filteringModes, hostname, afterLevel);
     await writeFilteringModeDetails(filteringModes);
@@ -399,7 +379,7 @@ export function getDefaultFilteringMode() {
 }
 
 export function setDefaultFilteringMode(afterLevel) {
-    return setFilteringMode('all-urls', afterLevel);
+    return setFilteringMode('all-urls', MODE_COMPLETE);
 }
 
 /******************************************************************************/

@@ -43,10 +43,7 @@ import { filteringModesToDNR } from './ruleset-manager.js';
 
 /******************************************************************************/
 
-// 0:       no filtering
-// 1:    basic filtering
-// 2:  optimal filtering
-// 3: complete filtering
+// Filter mode constants (BYTC Protect enforces MODE_COMPLETE)
 
 export const     MODE_NONE = 0;
 export const    MODE_BASIC = 1;

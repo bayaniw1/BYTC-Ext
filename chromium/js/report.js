@@ -141,7 +141,7 @@ async function getConfigData() {
         agent += ` (${platformInfo.os})`
         return agent;
     })();
-    const modes = [ 'no filtering', 'basic', 'optimal', 'complete' ];
+    const modes = [ 'complete', 'complete', 'complete', 'complete' ];
     const config = {
         name: manifest.name,
         version: manifest.version,
