@@ -111,6 +111,15 @@ async function registerSponsorBlock() {
     await browser.scripting.registerContentScripts([ directive ]).catch(reason => { console.info(reason); });
 }
 
+async function getSponsorBlockStatus() {
+    if ( browser.scripting === undefined ) { return 'error'; }
+    const registered = await browser.scripting.getRegisteredContentScripts().catch(( ) => []);
+    if ( Array.isArray(registered) && registered.some(v => v.id === 'sponsorblock') ) {
+        return 'active';
+    }
+    return 'error';
+}
+
 /******************************************************************************/
 
 function getCurrentVersion() {
@@ -399,6 +408,10 @@ function onMessage(request, sender, callback) {
         getFilteringModeDetails(true).then(details => {
             callback(details);
         });
+        return true;
+
+    case 'getSponsorBlockStatus':
+        getSponsorBlockStatus().then(status => { callback(status); });
         return true;
 
     case 'setFilteringModeDetails':

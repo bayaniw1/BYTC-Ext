@@ -17,35 +17,24 @@
 
 <div id="main">
     <div id="hostname"><span></span>&shy;<span></span></div>
-    <!-- -------- -->
-    <div class="filteringModeSlider">
-        <div class="filteringModeButton"><div></div></div>
-        <span data-level="0"></span>
-        <span data-level="1"></span>
-        <span data-level="2"></span>
-        <span data-level="3"></span>
-    </div>
-    <!-- -------- -->
-    <div id="filteringModeText"><label data-i18n="popupFilteringModeLabel">_</label><br><span>_</span><span></span></div>
-    <!-- -------- -->
-    <div class="toolRibbon pageTools">
-        <span id="gotoZapper" class="fa-icon tool enabled" data-i18n-title="zapperTipEnter">bolt<span class="caption" data-i18n="zapperTipEnter"></span></span>
-        <span id="showMatchedRules" class="fa-icon tool" tabindex="0" title="Show matched rules">list-alt<span class="caption">Show matched rules</span></span>
-        <span id="reportFilterIssue" class="fa-icon tool enabled" data-i18n-title="popupTipReport">comment-alt<span class="caption" data-i18n="popupTipReport"></span></span>
-        <span id="gotoDashboard" class="fa-icon tool enabled" tabindex="0" data-i18n-title="popupTipDashboard">cogs<span class="caption" data-i18n="popupTipDashboard"></span></span>
-    </div>
-    <!-- -------- -->
-    <div id="rulesetStats" data-section="a">
-    </div>
-    <hr data-section="a">
-    <!-- -------- -->
-    <div id="moreOrLess">
-        <span id="moreButton">
-            <span data-i18n="popupMoreButton">_</span>&emsp;<span class="fa-icon">angle-up</span>
-        </span>
-        <span id="lessButton">
-            <span class="fa-icon">angle-up</span>&emsp;<span data-i18n="popupLessButton">_</span>
-        </span>
+    <div id="w11-sections">
+        <div class="w11-section" id="adblock-section">
+            <h2>Adblocking</h2>
+            <p>Complete filtering enforced</p>
+            <button id="open-ublock-settings">uBlock Settings</button>
+        </div>
+        <div class="w11-section" id="tracking-section">
+            <h2>Anti-Tracking</h2>
+            <p id="tracking-status">Active</p>
+        </div>
+        <div class="w11-section" id="sponsorblock-section">
+            <h2>Sponsorblock</h2>
+            <p id="sponsorblock-status">Checking…</p>
+        </div>
+        <div class="w11-section" id="diagnostic-section">
+            <h2>Diagnostics</h2>
+            <button id="open-diagnostic">Open</button>
+        </div>
     </div>
 </div>
 
@@ -57,6 +46,7 @@
 <script src="js/fa-icons.js" type="module"></script>
 <script src="js/i18n.js" type="module"></script>
 <script src="js/popup.js" type="module"></script>
+<script src="js/popup-custom.js" type="module"></script>
 
 </body>
 
